@@ -5,6 +5,7 @@ const isClick = require('./lib/is_click');
 const isTap = require('./lib/is_tap');
 const Constants = require('./constants');
 const objectToMode = require('./modes/object_to_mode');
+const debounce = require('./lib/debounce');
 
 module.exports = function(ctx) {
 
@@ -46,6 +47,10 @@ module.exports = function(ctx) {
     }
     const target = getFeaturesAndSetCursor(event, ctx);
     event.featureTarget = target;
+      // @MKO - 5/21/19 - Adding Simple/Direct Select Check to Lower
+    //  CPU Overhead on Mouse Movement Over Map
+    if(ctx.api.getMode() !== Constants.modes.SIMPLE_SELECT &&
+    ctx.api.getMode() !== Constants.modes.DIRECT_SELECT)
     currentMode.mousemove(event);
   };
 
@@ -231,7 +236,8 @@ module.exports = function(ctx) {
       ctx.container.addEventListener('mouseout', events.mouseout);
 
       if (ctx.options.keybindings) {
-        ctx.container.addEventListener('keydown', events.keydown);
+        // @MKO - 5/21/2019 Adding Debounce to Reduce Keydown Handler CPU
+        ctx.container.addEventListener('keydown', debounce(events.keydown, 500));
         ctx.container.addEventListener('keyup', events.keyup);
       }
     },

@@ -38,7 +38,9 @@ const ModeHandler = function(mode, DrawContext) {
       const handle = handles[iHandle];
       if (handle.selector(event)) {
         handle.fn.call(ctx, event);
-        DrawContext.store.render();
+        // @MKO Implemented Suggestion for Performance Improvement: 
+        // https://github.com/mapbox/mapbox-gl-draw/issues/760#issuecomment-390371628
+        if (handle.fn.render !== false) DrawContext.store.render();;
         DrawContext.ui.updateMapClasses();
 
         // ensure an event is only handled once
