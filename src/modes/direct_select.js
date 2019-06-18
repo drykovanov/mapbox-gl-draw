@@ -165,7 +165,12 @@ DirectSelect.toDisplayFeatures = function(state, geojson, push) {
 };
 
 DirectSelect.onTrash = function(state) {
-  state.selectedCoordPaths.sort().reverse().forEach(id => state.feature.removeCoordinate(id));
+  // @MKO - 6/18/2019 Fix for https://github.com/mapbox/mapbox-gl-draw/issues/897
+  state.selectedCoordPaths.map(p => {return {coord_path: p, sort_val: parseInt(p.split('.')[p.split(".").length -1], 10)}})
+  .sort((a, b) => a.sort_val - b.sort_val)
+  .map(p => p.coord_path)
+  .reverse()
+  .forEach(id => state.feature.removeCoordinate(id));
   this.fireUpdate();
   state.selectedCoordPaths = [];
   this.clearSelectedCoordinates();
